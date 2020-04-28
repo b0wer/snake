@@ -20,13 +20,14 @@ all_sprites = pygame.sprite.Group()
 
 snake = GameBoard.snake(screen)
 board = GameBoard.board(screen, snake.life, 0)
+eat = GameBoard.eat(screen)
 
 x = 1
 y = 0
 
 running = True
 while running:
-    clock.tick(20)
+    clock.tick(10)
     # Ввод собития
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -35,17 +36,21 @@ while running:
         if event.type == pygame.KEYDOWN:
             # Выясняем какая именно кнопка была нажата
             if event.key == pygame.K_LEFT:
-                snake.vector = [-1, 0]
+                if snake.vector != [1, 0]:
+                    snake.vector = [-1, 0]
             if event.key == pygame.K_RIGHT:
-                snake.vector = [1, 0]
+                if snake.vector != [-1, 0]:
+                    snake.vector = [1, 0]
             if event.key == pygame.K_UP:
-                snake.vector = [0, -1]
+                if snake.vector != [0, 1]:
+                    snake.vector = [0, -1]
             if event.key == pygame.K_DOWN:
-                snake.vector = [0, 1]
+                if snake.vector != [0, -1]:
+                    snake.vector = [0, 1]
 
     # Обновление
     if len(snake.coordinate):
-        snake.stepping()
+        snake.stepping(eat)
     else:
         running = False
 
@@ -56,6 +61,7 @@ while running:
     all_sprites.draw(screen)
     board.draw()
     snake.draw()
+    eat.draw(snake)
     pygame.display.flip()  # Показываем кадр
 
 pygame.quit()
