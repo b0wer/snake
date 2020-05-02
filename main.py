@@ -1,4 +1,5 @@
 import pygame
+import time
 
 import GameBoard
 
@@ -19,27 +20,36 @@ eat = GameBoard.eat(screen)
 running = True
 while running:
     clock.tick(20)
+
     # Ввод собития.
+
+    #   За один кадр могут быть нажаты 2 клавиши движения, чтоб исключить возможность пойти в противоположную сторону
+    # мы будем принимать только первое нажатие. Переменная VectorKeyON нам в помощь.
+    VectorKeyON = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN and not VectorKeyON:
             # Выясняем какая именно кнопка была нажата.
 
             # Кнопки вектора движения. Змейка не должна себя съедать, меняя вектор на  противоположный.
             if event.key == pygame.K_LEFT:
                 if snake.vector != [1, 0]:
                     snake.vector = [-1, 0]
+                    VectorKeyON = True
             if event.key == pygame.K_RIGHT:
                 if snake.vector != [-1, 0]:
                     snake.vector = [1, 0]
+                    VectorKeyON = True
             if event.key == pygame.K_UP:
                 if snake.vector != [0, 1]:
                     snake.vector = [0, -1]
+                    VectorKeyON = True
             if event.key == pygame.K_DOWN:
                 if snake.vector != [0, -1]:
                     snake.vector = [0, 1]
+                    VectorKeyON = True
 
     # Обновление.
     if len(snake.coordinate):
