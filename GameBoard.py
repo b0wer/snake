@@ -1,12 +1,14 @@
 import pygame
 import random
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-
+color = {
+    'BLACK': (0, 0, 0),
+    'WHITE': (255, 255, 255),
+    'RED': (255, 0, 0),
+    'GREEN': (0, 255, 0),
+    'BLUE': (0, 0, 255),
+    'YELLOW': (255, 255, 0),
+}
 
 class board():
     def __init__(self, surface, life, score):
@@ -16,7 +18,7 @@ class board():
 
     def draw(self):
         # Рамка
-        pygame.draw.rect(self.surface, (WHITE), ((10, 10, 380, 80)), 5)
+        pygame.draw.rect(self.surface, (color['WHITE']), ((10, 10, 380, 80)), 5)
         # Жизни
         self._drowText("Life:", 35, 40)
         self._drowLife()
@@ -28,9 +30,9 @@ class board():
 
     def _drowLife(self):
         for i in range(self.life):
-            pygame.draw.circle(self.surface, RED, ((30 * i + 100, 50)), 10, 0)
+            pygame.draw.circle(self.surface, color['RED'], ((30*i+100, 50)), 10, 0)
 
-    def _drowText(self, text, x, y, font=None, size=30, color=WHITE):
+    def _drowText(self, text, x, y, font=None, size=30, color=color['WHITE']):
         font = pygame.font.Font(font, size)
         Text = font.render(text, True, color)
         self.surface.blit(Text, (x, y))
@@ -41,7 +43,7 @@ class board():
 
         for y in range(0, int(HEIGHT / 10)):
             for x in range(0, int(WIDTH / 10)):
-                pygame.draw.rect(self.surface, (30, 30, 30), ((10 * x + 10, 10 * y + 110, 10, 10)), 1)
+                pygame.draw.rect(self.surface, (30, 30, 30), ((10*x+10, 10*y+110, 10, 10)), 1)
 
     def update(self, life, score):
         self.life = life
@@ -58,14 +60,14 @@ class snake():
 
     def draw(self):
         for square in self.coordinate:
-            pygame.draw.rect(self.surface, GREEN, ((square[0] * 10, square[1] * 10 + 100, 10, 10)))
+            pygame.draw.rect(self.surface, color['GREEN'], ((square[0]*10, square[1]*10+100, 10, 10)))
 
     def stepping(self, eat):
         x = self.vector[0]
         y = self.vector[1]
         last = self.coordinate[-1]
-        if (0 < last[0] + x <= 38) and (0 < last[1] + y <= 48):  # Проверка на границы поля
-            self.coordinate.append([last[0] + x, last[1] + y])  # Рисуем голову
+        if (0 < last[0]+x <= 38) and (0 < last[1]+y <= 48):  # Проверка на границы поля
+            self.coordinate.append([last[0]+x, last[1]+y])  # Рисуем голову
             if self.coordinate.count(eat.coordinate) == 0:  # Проверка на съеденную еду
                 self.coordinate.pop(0)  # Если не съели хавку, удаляем хвост
                 if self.coordinate[:-1].count(self.coordinate[-1]) and len(self.coordinate) > 1:  # Съел ли сам себя
@@ -94,7 +96,7 @@ class eat():
             self.coordinate = self._getCoordinate()
         x = self.coordinate[0]
         y = self.coordinate[1]
-        pygame.draw.circle(self.surface, BLUE, ((x * 10 + 5, y * 10 + 105)), 5)
+        pygame.draw.circle(self.surface, color['YELLOW'], ((x*10+5, y*10+105)), 5)
 
     def _getCoordinate(self):
         x = random.randrange(1, 38, 1)

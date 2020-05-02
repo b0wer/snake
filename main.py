@@ -6,35 +6,28 @@ WIDTH = 400
 HEIGHT = 600
 FPS = 60
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
+pygame.init()  # Запускаем pygame.
+screen = pygame.display.set_mode((WIDTH, HEIGHT))  # Задаём разрешение экрана.
+pygame.display.set_caption('Змейка')  # Заголовок окна игры.
+clock = pygame.time.Clock()  # Инициализируем время, отсчет идет от init()
 
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Змейка')
-clock = pygame.time.Clock()
-all_sprites = pygame.sprite.Group()
-
+# Инициализируем наши объекты.
 snake = GameBoard.snake(screen)
 board = GameBoard.board(screen, snake.life, 0)
 eat = GameBoard.eat(screen)
 
-x = 1
-y = 0
-
 running = True
 while running:
-    clock.tick(10)
-    # Ввод собития
+    clock.tick(20)
+    # Ввод собития.
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
         if event.type == pygame.KEYDOWN:
-            # Выясняем какая именно кнопка была нажата
+            # Выясняем какая именно кнопка была нажата.
+
+            # Кнопки вектора движения. Змейка не должна себя съедать, меняя вектор на  противоположный.
             if event.key == pygame.K_LEFT:
                 if snake.vector != [1, 0]:
                     snake.vector = [-1, 0]
@@ -48,20 +41,21 @@ while running:
                 if snake.vector != [0, -1]:
                     snake.vector = [0, 1]
 
-    # Обновление
+    # Обновление.
     if len(snake.coordinate):
         snake.stepping(eat)
     else:
         running = False
 
     board.update(snake.life, snake.score)
-    all_sprites.update()
-    # Визуализация
-    screen.fill(BLACK)  # Очистка эрана
-    all_sprites.draw(screen)
+
+    # Визуализация.
+    screen.fill(GameBoard.color['BLACK'])  # Очистка эрана. Заливка черным цветом.
+
     board.draw()
     snake.draw()
     eat.draw(snake)
-    pygame.display.flip()  # Показываем кадр
+
+    pygame.display.flip()  # Показываем кадр.
 
 pygame.quit()
