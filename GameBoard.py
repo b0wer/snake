@@ -10,15 +10,25 @@ color = {
     'YELLOW': (255, 255, 0),
 }
 
-class board():
+class board(pygame.sprite.Sprite):
     def __init__(self, surface, life, score):
+        pygame.sprite.Sprite.__init__(self)
         self.surface = surface
         self.life = 3 if life > 3 else life
         self.score = score
 
+        self.image = pygame.image.load('sprite/fon.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.img_backLogo = {'image': pygame.image.load('sprite/GameBoard/logo.png').convert_alpha(),
+                             'rect': (0, 250)}
+        self.img_topBar = {'image': pygame.image.load('sprite/GameBoard/fon_topBar.png').convert_alpha(),
+                           'rect': (0, 0)}
+        self.img_heart = pygame.image.load('sprite/GameBoard/heart.png').convert_alpha()
+
+
     def draw(self):
-        # Рамка
-        pygame.draw.rect(self.surface, (color['WHITE']), ((10, 10, 380, 80)), 5)
+        self.surface.blit(self.img_backLogo['image'], self.img_backLogo['rect'])  # Фон
+        self.surface.blit(self.img_topBar['image'], self.img_topBar['rect'])  # Фон верхнего бара
         # Жизни
         self._drowText("Life:", 35, 40)
         self._drowLife()
@@ -28,9 +38,10 @@ class board():
         # Поле из клеточек
         self._drowField()
 
+
     def _drowLife(self):
         for i in range(self.life):
-            pygame.draw.circle(self.surface, color['RED'], ((30*i+100, 50)), 10, 0)
+            self.surface.blit(self.img_heart, (32*i+95, 38))
 
     def _drowText(self, text, x, y, font=None, size=30, color=color['WHITE']):
         font = pygame.font.Font(font, size)
@@ -38,12 +49,12 @@ class board():
         self.surface.blit(Text, (x, y))
 
     def _drowField(self):
-        WIDTH = 400 - 20
-        HEIGHT = 500 - 20
+        FIELD_WIDTH = self.surface.get_width() - 10  # Остступ скраю 10px
+        FIELD_HEIGHT = self.surface.get_height() - 92 - 10  # Остступ сверху 92(верхний бар) 10(от бара вниз)
 
-        for y in range(0, int(HEIGHT / 10)):
-            for x in range(0, int(WIDTH / 10)):
-                pygame.draw.rect(self.surface, (30, 30, 30), ((10*x+10, 10*y+110, 10, 10)), 1)
+        for y in range(0, int(FIELD_HEIGHT // 20)):
+            for x in range(0, int(FIELD_WIDTH // 20)):
+                pygame.draw.rect(self.surface, (55, 61, 66), ((20*x+10, 20*y+110, 20, 20)), 1)
 
     def update(self, life, score):
         self.life = life
@@ -60,15 +71,18 @@ class snake():
 
     def draw(self):
         for square in self.coordinate:
-            pygame.draw.rect(self.surface, color['GREEN'], ((square[0]*10, square[1]*10+100, 10, 10)))
+            pygame.draw.rect(self.surface, color['GREEN'], ((square[0]*20+10, square[1]*20+90, 20, 20)))
 
-    def stepping(self, eat):
+    def stepping(self, food):
         x = self.vector[0]
         y = self.vector[1]
         last = self.coordinate[-1]
-        if (0 < last[0]+x <= 38) and (0 < last[1]+y <= 48):  # Проверка на границы поля
+        width_pt = (self.surface.get_width() - 10) // 20
+        height_pt = (self.surface.get_height() - 92 - 10) // 20
+
+        if (0 < last[0]+x < width_pt) and (0 < last[1]+y < height_pt):  # Проверка на границы поля
             self.coordinate.append([last[0]+x, last[1]+y])  # Рисуем голову
-            if self.coordinate.count(eat.coordinate) == 0:  # Проверка на съеденную еду
+            if self.coordinate.count(food.coordinate) == 0:  # Проверка на съеденную еду
                 self.coordinate.pop(0)  # Если не съели хавку, удаляем хвост
                 if self.coordinate[:-1].count(self.coordinate[-1]) and len(self.coordinate) > 1:  # Съел ли сам себя
                     self._kill()
@@ -86,19 +100,23 @@ class snake():
             self.coordinate.clear()
 
 
-class eat():
+class food():
     def __init__(self, surface):
         self.surface = surface
         self.coordinate = self._getCoordinate()
+        self.image = pygame.image.load('sprite/GameBoard/food/food.png').convert_alpha()
 
     def draw(self, snake):
         while snake.coordinate.count(self.coordinate):
             self.coordinate = self._getCoordinate()
+
         x = self.coordinate[0]
         y = self.coordinate[1]
-        pygame.draw.circle(self.surface, color['YELLOW'], ((x*10+5, y*10+105)), 5)
+        self.surface.blit(self.image, (x * 20 + 10, y * 20 + 90))
 
     def _getCoordinate(self):
-        x = random.randrange(1, 38, 1)
-        y = random.randrange(1, 48, 1)
+        width_pt = (self.surface.get_width() - 10) // 20
+        height_pt = (self.surface.get_height() - 92 - 10) // 20
+        x = random.randrange(1, width_pt, 1)
+        y = random.randrange(1, height_pt, 1)
         return [x, y]

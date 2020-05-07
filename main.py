@@ -15,13 +15,15 @@ clock = pygame.time.Clock()  # Инициализируем время, отсч
 # Инициализируем наши объекты.
 snake = GameBoard.snake(screen)
 board = GameBoard.board(screen, snake.life, 0)
-eat = GameBoard.eat(screen)
 
+food = GameBoard.food(screen)
+GroupBoard = pygame.sprite.Group()
+GroupBoard.add(board)
 running = True
 while running:
     clock.tick(20)
 
-    # Ввод собития.
+    # Ввод события.
 
     #   За один кадр могут быть нажаты 2 клавиши движения, чтоб исключить возможность пойти в противоположную сторону
     # мы будем принимать только первое нажатие. Переменная VectorKeyON нам в помощь.
@@ -51,20 +53,21 @@ while running:
                     snake.vector = [0, 1]
                     VectorKeyON = True
 
-    # Обновление.
+    # Обновление. (изменение объектов и их свойств)
     if len(snake.coordinate):
-        snake.stepping(eat)
+        snake.stepping(food)
     else:
         running = False
 
-    board.update(snake.life, snake.score)
+    GroupBoard.update(snake.life, snake.score)
 
-    # Визуализация.
-    screen.fill(GameBoard.color['BLACK'])  # Очистка эрана. Заливка черным цветом.
-
+    # Визуализация. (отрисовка измененных объектов)
+    screen.fill((GameBoard.color['BLACK']))  # Очистка эрана. Заливка черным цветом.
+    GroupBoard.draw(screen)
     board.draw()
+
     snake.draw()
-    eat.draw(snake)
+    food.draw(snake)
 
     pygame.display.flip()  # Показываем кадр.
 
